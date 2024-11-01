@@ -7,7 +7,7 @@ import InsideCanvas from "./InsideCanvas";
 
 const SceneCanvas = () => {
   return (
-    <Canvas>
+    <Canvas className="bg-gray-900">
       <ScrollControls page={10} damping={0.3}>
         <InsideCanvas />
       </ScrollControls>

@@ -1,17 +1,16 @@
 import { Environment } from "@react-three/drei";
-import { RGBELoader } from "three-stdlib";
 
 const Background = () => {
   return (
     <>
-      <ambientLight intensity={1} />
-      <Environment
+      {/* <Environment
         background
-        files="/images/milkyway.exr"
+        files="/images/HDR_blue_nebulae-1.hdr"
         loader={RGBELoader}
         intensity={4}
         rotation={[0, Math.PI, 0]}
-      />
+      /> */}
+      <Environment preset="city" />
     </>
   );
 };

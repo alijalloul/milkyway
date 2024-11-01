@@ -1,6 +1,6 @@
 "use client";
 
-import { Float, PerspectiveCamera, useScroll } from "@react-three/drei";
+import { Float, PerspectiveCamera, Text, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useMemo, useRef } from "react";
 
@@ -84,12 +84,12 @@ const InsideCanvas = () => {
     return Math.random() * (max - min) + min;
   };
 
-  const zPositions = Array.from({ length: 10 }, (_, i) => -10 * (i + 1));
+  const zPositions = Array.from({ length: 10 }, (_, i) => -10 * (2 * (i + 1)));
 
   const asteroidPositions = zPositions.map((z) => [
-    generateRandomXY(-5, 5), // Random X within [-5, 5]
-    generateRandomXY(-5, 5), // Random Y within [-5, 5]
-    z, // Fixed Z position
+    generateRandomXY(-20, 20),
+    generateRandomXY(-5, 5),
+    z,
   ]);
 
   return (
@@ -109,6 +109,10 @@ const InsideCanvas = () => {
                 <SpaceShip rotation-y={Math.PI} scale={0.2} position-y={0.1} />
               </Float>
             </group>
+          </group>
+
+          <group position={[-3, 0, -20]}>
+            <Text></Text>
           </group>
 
           <group position-y={-2}>
