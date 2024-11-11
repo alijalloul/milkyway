@@ -1,25 +1,39 @@
 "use client";
 
-import { Float, PerspectiveCamera, Text, useScroll } from "@react-three/drei";
+import {
+  Float,
+  OrbitControls,
+  PerspectiveCamera,
+  useScroll,
+} from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 
 import * as THREE from "three";
 
-import Asteroid from "./Asteroid";
-import Background from "./Background";
 import Loader from "./Loader";
 import SpaceShip from "./SpaceShip";
+
+import helvetikerFont from "three/examples/fonts/helvetiker_regular.typeface.json";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
+import Asteroids from "./Asteroids";
+import Background from "./Background";
+import Planets from "./Planets";
 
 const NB_POINTS = 10000;
 
 const InsideCanvas = () => {
+  const textMeshRef = useRef();
   const cameraRef = useRef();
   const spaceShipRef = useRef();
+  const orbitControlsRef = useRef();
+
   const scroll = useScroll();
 
   useFrame((_state, delta) => {
-    if (cameraRef.current && spaceShipRef.current) {
+    if (cameraRef.current && spaceShipRef.current && orbitControlsRef.current) {
+      orbitControlsRef.current.enabled = false; // Disable during animation
       const curPointIndex = Math.min(
         Math.round(scroll.offset * linePoints.length),
         linePoints.length - 1
@@ -44,6 +58,8 @@ const InsideCanvas = () => {
 
       spaceShipRef.current.quaternion.slerp(targetQuaternionShip, delta * 2);
       cameraRef.current.position.lerp(curPoint, delta * 24);
+
+      // orbitControlsRef.current.enabled = true;
     }
   });
 
@@ -61,6 +77,47 @@ const InsideCanvas = () => {
         new THREE.Vector3(0, 0, -80),
         new THREE.Vector3(0, 0, -90),
         new THREE.Vector3(0, 0, -100),
+        new THREE.Vector3(0, 0, -110),
+        new THREE.Vector3(-2, 0, -120),
+        new THREE.Vector3(-3, 0, -130),
+        new THREE.Vector3(0, 0, -140),
+        new THREE.Vector3(5, 0, -150),
+        new THREE.Vector3(7, 0, -160),
+        new THREE.Vector3(5, 0, -170),
+        new THREE.Vector3(0, 0, -180),
+        new THREE.Vector3(0, 0, -190),
+        new THREE.Vector3(0, 0, -200),
+        new THREE.Vector3(0, 0, -210),
+        new THREE.Vector3(-2, 0, -220),
+        new THREE.Vector3(-3, 0, -230),
+        new THREE.Vector3(0, 0, -240),
+        new THREE.Vector3(5, 0, -250),
+        new THREE.Vector3(7, 0, -260),
+        new THREE.Vector3(5, 0, -270),
+        new THREE.Vector3(0, 0, -280),
+        new THREE.Vector3(0, 0, -290),
+        new THREE.Vector3(0, 0, -300),
+        new THREE.Vector3(0, 0, -310),
+        new THREE.Vector3(-2, 0, -320),
+        new THREE.Vector3(-3, 0, -330),
+        new THREE.Vector3(0, 0, -340),
+        new THREE.Vector3(5, 0, -350),
+        new THREE.Vector3(7, 0, -360),
+        new THREE.Vector3(5, 0, -370),
+        new THREE.Vector3(0, 0, -380),
+        new THREE.Vector3(0, 0, -390),
+        new THREE.Vector3(0, 0, -400),
+        new THREE.Vector3(0, 0, -400),
+        new THREE.Vector3(0, 0, -410),
+        new THREE.Vector3(-2, 0, -420),
+        new THREE.Vector3(-3, 0, -430),
+        new THREE.Vector3(0, 0, -440),
+        new THREE.Vector3(5, 0, -450),
+        new THREE.Vector3(7, 0, -460),
+        new THREE.Vector3(5, 0, -470),
+        new THREE.Vector3(0, 0, -480),
+        new THREE.Vector3(0, 0, -490),
+        new THREE.Vector3(0, 0, -500),
       ],
       false,
       "catmullrom",
@@ -80,17 +137,37 @@ const InsideCanvas = () => {
     return shape;
   }, [curve]);
 
-  const generateRandomXY = (min, max) => {
-    return Math.random() * (max - min) + min;
-  };
+  useEffect(() => {
+    const font = new FontLoader().parse(helvetikerFont);
+    const lines = [
+      "Our Solar System is a collection of planets,",
+      "moons, asteroids, comets, and other celestial bodies",
+      "orbiting our Sun. It includes eight major planets,",
+      "with Earth as the only known habitable one,",
+      "and extends through the Kuiper Belt",
+      "to the distant Oort Cloud.",
+    ];
 
-  const zPositions = Array.from({ length: 10 }, (_, i) => -10 * (2 * (i + 1)));
+    lines.forEach((line, index) => {
+      const textGeometry = new TextGeometry(line, {
+        font: font,
+        size: 1,
+        height: 0.5,
+        curveSegments: 12,
+      });
 
-  const asteroidPositions = zPositions.map((z) => [
-    generateRandomXY(-20, 20),
-    generateRandomXY(-5, 5),
-    z,
-  ]);
+      const textMaterial = new THREE.MeshBasicMaterial({ color: "white" });
+      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+      // Position each line with some spacing (e.g., 1.2 units apart)
+      textMesh.position.set(-20, 2 - index * 1.2, -20);
+      textMesh.rotation.y += 0.2;
+
+      if (textMeshRef.current) {
+        textMeshRef.current.add(textMesh);
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -110,11 +187,7 @@ const InsideCanvas = () => {
               </Float>
             </group>
           </group>
-
-          <group position={[-3, 0, -20]}>
-            <Text></Text>
-          </group>
-
+          <group position={[-3, 0, -20]} ref={textMeshRef}></group>
           <group position-y={-2}>
             <mesh>
               <extrudeGeometry
@@ -131,31 +204,20 @@ const InsideCanvas = () => {
             </mesh>
           </group>
 
-          {asteroidPositions.map((position, index) => (
-            <RandomAsteroid key={index} position={position} />
-          ))}
+          <Asteroids />
+
+          <Planets />
         </Suspense>
       </group>
+
+      <OrbitControls
+        ref={orbitControlsRef}
+        makeDefault
+        enableZoom={false}
+        enablePan={false}
+      />
     </>
   );
 };
 
 export default InsideCanvas;
-
-const RandomAsteroid = ({ position }) => {
-  return (
-    <Asteroid
-      scale={[
-        Math.random() / 2 + 0.5,
-        Math.random() / 2 + 0.5,
-        Math.random() / 2 + 0.5,
-      ]}
-      rotation={[
-        Math.random() / 2 + 0.5,
-        Math.random() / 2 + 0.5,
-        Math.random() / 2 + 0.5,
-      ]}
-      position={position}
-    />
-  );
-};
