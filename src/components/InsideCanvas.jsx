@@ -59,7 +59,7 @@ const InsideCanvas = () => {
       spaceShipRef.current.quaternion.slerp(targetQuaternionShip, delta * 2);
       cameraRef.current.position.lerp(curPoint, delta * 24);
 
-      // orbitControlsRef.current.enabled = true;
+        // orbitControlsRef.current.enabled = true;
     }
   });
 
